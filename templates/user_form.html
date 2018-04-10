@@ -2,37 +2,41 @@
 <html>
     <body>
         <h1>Signup</h1>
-        <form method='POST'>
+        <form action= '/validate'; method='POST'>
 
             <label>Username:
                 <input name="user-name" type="text" value='{{user}}' />
             </label>
-            <p class="error">{{username_error}}</p>
+            <p style="display: inline; " class="error">{{username_error}}</p>
 
+            <br>
             <br>
 
             <label>Password:
                 <input name="password" type="password" />
             </label>
-            <p class="error">{{password_error}}</p> 
+            <p style="display: inline;" class="error">{{password_error}}</p> 
             
 
+            <br>
             <br>
 
             <label>Verify password:
                 <input name="password-conf" type="password" />
             </label>
-            <p class="error">{{password_conf_error}}</p> 
+            <p style="display: inline;" class="error">{{password_conf_error}}</p> 
             
 
+            <br>
             <br>
 
             <label>Email (optional):
                 <input name="email" type="text" />
             </label>
-            <p class="error">{{email_error}}</p> 
+            <p style= "display: inline;" class="error">{{email_error}}</p> 
             
 
+            <br>
             <br>
 
             <input type="submit" />
