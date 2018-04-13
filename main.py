@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, render_template
 import cgi
 import os
 import jinja2
@@ -9,11 +9,10 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), a
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-@app.route('/validate')
-def index():
-    template = jinja_env.get_template('user_form.html') 
+@app.route('/')
+def index(): 
     #username_error = request.args.get("error")
-    return template.render()
+    return render_template("user_form.html")
    
 
 #validation( reject and re-render form with feedback) 
@@ -41,17 +40,24 @@ def valid_password_conf(password, password_conf):
     else:
         return False
 
-#       IF email field filled in, must have 3-20 char no space, a single @ and a single .
-#def valid_email(string)
-#    if char in string == char.isalnum or
+#   IF email field filled in, must have 3-20 char no space, a single @ and a single .
+#   def valid_email(string)
+#   if char in string == char.isalnum or
 
-#def valid_email_field(email)
+def valid_email(email):
+    if email == '':
+        return True
+    else:
+        if email.count('@') == 1 and email.count('.') == 1 and valid_char_count(email) and no_space_string(email):
+            return True
+        else: 
+            return False
     
 
 # each feedback message should be next to the field it refers to
 
 
-@app.route('/validate', methods=['POST'])
+@app.route('/', methods=['POST'])
 def validate_user():
     username=request.form['user-name']
     password=request.form['password']
@@ -63,35 +69,41 @@ def validate_user():
     password_conf_error=''
     email_error=''
     
-    if not valid_char_count(username) or no_space_string(username):
+    if not valid_char_count(username) or not no_space_string(username):
         username_error = "That's not a valid username"
-        username = ''
+        username= ''
         
-    if not valid_char_count(password) or no_space_string(password):
+    if not valid_char_count(password) or not no_space_string(password):
         password_error = "That's not a valid password"
-        password = ''
 
-    if not valid_char_count(verify_password) and valid_password_conf(password, verify_password):
+    if not valid_char_count(verify_password) or not valid_password_conf(password, verify_password):
         password_conf_error = "Passwords do not match"
-        password_conf_error = ''
+
+    if not valid_email(email):
+        email_error = "That's not a valid email"
+        email = ''
     
-    if not username_error and not password_error and not password_conf_error:
-        return redirect("/welcome")
+    if not username_error and not password_error and not password_conf_error and not email_error:
+        return redirect("/welcome?user=" + username)
 
     else:
-        template = jinja_env.get_template('user_form.html')
-        return template.render(username=username, password=password, verify_password=verify_password)    
+        return render_template("user_form.html",
+                                username=username,
+                                email=email,
+                                username_error=username_error,
+                                password_error=password_error,
+                                password_conf_error=password_conf_error,
+                                email_error=email_error)    
 
     
 # if input for username and email are valid, preserve what user typed
 
 #display a welcome message of "Welcome [username]"
 
-@app.route("/welcome-user", method=['POST'])
+@app.route("/welcome")
 def welcome():
-    user = request.form['user-name']
-    template= request.form('user-name')
-    return template.render(username-username)
+    user = request.args.get('user')
+    return render_template("welcome.html", username=user)
 
 app.run()
 
